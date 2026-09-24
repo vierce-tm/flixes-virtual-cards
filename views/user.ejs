@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — Flixes</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">⚡ Flixes</div>
+    <div class="me">
+      <img src="<%= user.picture %>" alt="" />
+      <span><%= user.name %></span>
+      <a href="/logout">Logout</a>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="dashboard-header">
+      <h1 class="page">Available Diamond Drops</h1>
+      <p class="muted">Browse and purchase premium diamond packages</p>
+    </div>
+    
+    <% if (!posts.length) { %>
+      <div class="empty-state">
+        <div class="empty-icon">💎</div>
+        <h3>No offers yet</h3>
+        <p class="muted">Check back soon for new diamond packages</p>
+      </div>
+    <% } %>
+    
+    <div class="grid">
+      <% posts.forEach((p, index) => { %>
+        <article class="post" style="animation-delay: <%= index * 0.1 %>s">
+          <% if (p.image) { %><img class="thumb" src="<%= p.image %>" alt="" /><% } %>
+          <h2><%= p.title %></h2>
+          <% if (p.price) { %><div class="price">₹ <%= p.price %></div><% } %>
+          <p><%= p.description %></p>
+          <% if (p.contact) { %><div class="contact">Contact: <b><%= p.contact %></b></div><% } %>
+          <div class="muted small"><%= new Date(p.created).toLocaleString() %></div>
+        </article>
+      <% }) %>
+    </div>
+  </main>
+  
+  <style>
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+  </style>
+</body>
+</html>

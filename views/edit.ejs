@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit Post — Flixes</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">⚡ Edit Post</div>
+    <div class="me">
+      <a href="/admin" class="btn">Back to Admin</a>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="dashboard-header">
+      <h1 class="page">Edit Diamond Post</h1>
+      <p class="muted">Update post details</p>
+    </div>
+    <section class="card">
+      <form method="POST" action="/admin/post/<%= post.id %>/edit" class="form">
+        <input name="title" value="<%= post.title %>" placeholder="Title" required />
+        <input name="price" value="<%= post.price %>" placeholder="Price (e.g. 250)" />
+        <textarea name="description" placeholder="Details / how it works" rows="4"><%= post.description %></textarea>
+        <input name="contact" value="<%= post.contact %>" placeholder="Contact (telegram / session / etc.)" />
+        <input name="image" value="<%= post.image %>" placeholder="Image URL (optional)" />
+        <button type="submit">Save Changes</button>
+      </form>
+    </section>
+  </main>
+  
+  <style>
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+  </style>
+</body>
+</html>

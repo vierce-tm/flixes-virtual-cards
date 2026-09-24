@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel — Flixes</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">⚡ Flixes Admin</div>
+    <div class="me">
+      <img src="<%= user.picture %>" alt="" />
+      <span><%= user.name %></span>
+      <a href="/user">User view</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="dashboard-header">
+      <h1 class="page">Admin Dashboard</h1>
+      <p class="muted">Manage diamond posts and users</p>
+    </div>
+
+    <section class="card">
+      <h2>💎 New Diamond Post</h2>
+      <form method="POST" action="/admin/post" class="form">
+        <input name="title" placeholder="Title (e.g. 1000 Diamonds — fast drop)" required />
+        <input name="price" placeholder="Price (e.g. 250)" />
+        <textarea name="description" placeholder="Details / how it works" rows="3"></textarea>
+        <input name="contact" placeholder="Contact (telegram / session / etc.)" />
+        <input name="image" placeholder="Image URL (optional)" />
+        <button type="submit">Publish Post</button>
+      </form>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2>📢 Live Posts (<%= posts.length %>)</h2>
+      </div>
+      <% if (posts.length === 0) { %>
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <h3>No posts yet</h3>
+          <p class="muted">Create your first diamond post above</p>
+        </div>
+      <% } else { %>
+        <% posts.forEach((p, index) => { %>
+          <div class="row" style="animation: fadeInUp 0.4s ease; animation-delay: <%= index * 0.05 %>s;">
+            <div>
+              <b><%= p.title %></b>
+              <% if (p.price) { %> — <span style="color: var(--success);">₹<%= p.price %></span><% } %>
+              <div class="muted small"><%= p.description %></div>
+            </div>
+            <div class="actions">
+              <a class="btn" href="/admin/post/<%= p.id %>/edit">Edit</a>
+              <form method="POST" action="/admin/post/<%= p.id %>/delete" onsubmit="return confirm('Delete this post?')">
+                <button class="btn danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2>👥 Users (<%= users.length %>)</h2>
+      </div>
+      <% if (users.length === 0) { %>
+        <div class="empty-state">
+          <div class="empty-icon">👤</div>
+          <h3>No users yet</h3>
+          <p class="muted">Users will appear here after they register</p>
+        </div>
+      <% } else { %>
+        <% users.forEach((u, index) => { %>
+          <div class="row" style="animation: fadeInUp 0.4s ease; animation-delay: <%= index * 0.05 %>s;">
+            <div>
+              <b><%= u.name %></b> — <span class="muted"><%= u.email %></span>
+            </div>
+            <div class="muted small"><%= new Date(u.joined).toLocaleDateString() %></div>
+          </div>
+        <% }) %>
+      <% } %>
+    </section>
+  </main>
+  
+  <style>
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+    
+    .section-header {
+      margin-bottom: 1rem;
+    }
+    
+    .section-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+  </style>
+</body>
+</html>
