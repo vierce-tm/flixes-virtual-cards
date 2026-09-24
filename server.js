@@ -113,7 +113,14 @@ app.get('/login', (req, res) => {
 app.get('/auth/google', (req, res) => {
   const state = crypto.randomBytes(16).toString('hex');
   req.session.oauthState = state;
-  res.redirect(googleAuthUrl(state));
+  const authUrl = googleAuthUrl(state);
+  console.log('Environment check:', {
+    clientId: process.env.GOOGLE_CLIENT_ID ? 'Set' : 'Missing',
+    redirectUri: process.env.GOOGLE_REDIRECT_URI,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ? 'Set' : 'Missing'
+  });
+  console.log('Redirecting to:', authUrl);
+  res.redirect(authUrl);
 });
 
 app.get('/auth/google/callback', async (req, res) => {
@@ -263,6 +270,16 @@ app.post('/api/refresh', requireAuth, async (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
+});
+
+// Debug endpoint to check environment variables
+app.get('/debug/env', (req, res) => {
+  res.json({
+    clientId: process.env.GOOGLE_CLIENT_ID ? 'Set' : 'Missing',
+    redirectUri: process.env.GOOGLE_REDIRECT_URI,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ? 'Set' : 'Missing',
+    adminEmails: process.env.ADMIN_EMAILS ? 'Set' : 'Missing'
+  });
 });
 
 app.listen(PORT, () => {
