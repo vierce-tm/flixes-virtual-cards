@@ -57,10 +57,25 @@ const GOOGLE_AUTH = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USER = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
-function googleAuthUrl(state) {
+function getRedirectUri(req) {
+  let uri = process.env.GOOGLE_REDIRECT_URI || '';
+  if (!uri && req) {
+    uri = `${req.protocol}://${req.get('host')}/auth/google/callback`;
+  }
+  uri = uri.trim();
+  const match = uri.match(/https?:\/\/[^\s]+/);
+  if (match) {
+    uri = match[0];
+  }
+  // Replace double slashes in URL path (preserve http:// or https://)
+  return uri.replace(/([^:]\/)\/+/g, '$1');
+}
+
+function googleAuthUrl(state, req) {
+  const redirectUri = getRedirectUri(req);
   const p = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID,
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+    redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'openid email profile',
     access_type: 'offline',
@@ -70,12 +85,13 @@ function googleAuthUrl(state) {
   return `${GOOGLE_AUTH}?${p.toString()}`;
 }
 
-async function exchangeCode(code) {
+async function exchangeCode(code, req) {
+  const redirectUri = getRedirectUri(req);
   const body = new URLSearchParams({
     code,
     client_id: process.env.GOOGLE_CLIENT_ID,
     client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+    redirect_uri: redirectUri,
     grant_type: 'authorization_code'
   });
   const r = await fetch(GOOGLE_TOKEN, {
@@ -145,10 +161,10 @@ app.get('/login', (req, res) => {
 app.get('/auth/google', (req, res) => {
   const state = crypto.randomBytes(16).toString('hex');
   req.session.oauthState = state;
-  const authUrl = googleAuthUrl(state);
+  const authUrl = googleAuthUrl(state, req);
   console.log('Environment check:', {
     clientId: process.env.GOOGLE_CLIENT_ID ? 'Set' : 'Missing',
-    redirectUri: process.env.GOOGLE_REDIRECT_URI,
+    redirectUri: getRedirectUri(req),
     clientSecret: process.env.GOOGLE_CLIENT_SECRET ? 'Set' : 'Missing'
   });
   console.log('Redirecting to:', authUrl);
@@ -161,7 +177,7 @@ app.get('/auth/google/callback', async (req, res) => {
     if (!code) return res.redirect('/login?error=no_code');
     if (state !== req.session.oauthState) return res.redirect('/login?error=state_mismatch');
 
-    const tokens = await exchangeCode(code);
+    const tokens = await exchangeCode(code, req);
     const profile = await fetchUser(tokens.access_token);
 
     req.session.user = {
