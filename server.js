@@ -119,17 +119,19 @@ app.get('/google:hash.html', (req, res) => {
 });
 
 app.get('/robots.txt', (req, res) => {
+  const host = req.get('host') || 'flixes.indevs.in';
   res.type('text/plain');
-  res.send("User-agent: *\nAllow: /\nSitemap: https://ff-carding-portal.vercel.app/sitemap.xml\n");
+  res.send(`User-agent: *\nAllow: /\nSitemap: https://${host}/sitemap.xml\n`);
 });
 
 app.get('/sitemap.xml', (req, res) => {
+  const host = req.get('host') || 'flixes.indevs.in';
   res.type('application/xml');
   res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://ff-carding-portal.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://ff-carding-portal.vercel.app/privacypolicy</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://ff-carding-portal.vercel.app/termsofservice</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://${host}/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://${host}/privacypolicy</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://${host}/termsofservice</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>`);
 });
 
