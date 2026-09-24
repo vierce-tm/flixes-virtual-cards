@@ -95,12 +95,42 @@ async function fetchUser(accessToken) {
   return r.json();
 }
 
-// ---------- routes ----------
 app.get('/', (req, res) => {
   if (req.session.user) {
     return res.redirect(isAdmin(req.session.user.email) ? '/admin' : '/user');
   }
-  res.render('index', { error: req.query.error || null });
+  res.render('index', {
+    error: req.query.error || null,
+    googleVerification: process.env.GOOGLE_SITE_VERIFICATION || ''
+  });
+});
+
+app.get(['/privacypolicy', '/privacy', '/privacy-policy'], (req, res) => {
+  res.render('privacy');
+});
+
+app.get(['/termsofservice', '/terms', '/terms-of-service'], (req, res) => {
+  res.render('terms');
+});
+
+app.get('/google:hash.html', (req, res) => {
+  res.type('text/html');
+  res.send(`google-site-verification: google${req.params.hash}.html`);
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send("User-agent: *\nAllow: /\nSitemap: https://ff-carding-portal.vercel.app/sitemap.xml\n");
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://ff-carding-portal.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ff-carding-portal.vercel.app/privacypolicy</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ff-carding-portal.vercel.app/termsofservice</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+</urlset>`);
 });
 
 app.get('/login', (req, res) => {
